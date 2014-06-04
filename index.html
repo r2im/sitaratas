@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>the ratas</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <style>
+    .card {
+      position: absolute;
+      left: 0px;
+      top: 0px;
+    }
+  </style>
+</head>
+<body>
+  <div id="board" style="position: relative; top: 50px">
+  </div>
+  <button data-bind="click: new_deal">Deal</button>
+  <button data-bind="click: eval_trick">Eval</button>
+  <script type="text/javascript" src="js/jquery-2.1.1.min.js"></script>
+  <script type="text/javascript" src="js/knockout-3.1.0.js"></script>
+  <script type="text/javascript" src="js/ratas.js"></script>
+  <script type="text/javascript">
+    var trick = [];
+    var hand;
+    var trumph;
+    var viewModel = {
+      on_select_card: function(arg0, event) {
+        $(event.currentTarget).animate({left: "+=100px", top: "+=100px"});
+        var i = $(event.currentTarget).attr("id").substring(1);
+        var card = ratas.get_card(i);
+        trick.push(card);
+      },
+      new_deal: function() {
+        $('#board').html('');
+        ratas.deck.shuffle();
+        hand = ratas.draw_cards(5);
+        for (var i = 0; i < 5; i++) {
+          hand[i].display((15 * i + 10) + "px", "10px");
+        }
+        trumph = ratas.draw_card();
+        trumph.display("400px", "10px");
+      },
+      eval_trick: function() {
+        var strongest = hand[0];
+        var s_i = 0
+        for(var i = 1; i < hand.length; i++) {    
+          var card = hand[i];
+          if (strongest.is_stronger(card, trumph.suit)) {
+            strongest = card;
+            s_i = i;
+          }
+        }
+        strongest.move("+=0px", "-=20px");
+        //console.log("strongest: " + strongest.str + " at " + s_i);
+      },
+    };
+
+    ko.applyBindings(viewModel);
+    
+  </script>
+</body>
+</html>
